@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <h1 style="font-weight: bold; color: black;">BikeLo</h1>
+  <img src="bike-logo.png" alt="BikeLo Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-weight: bold;
+      color: black;
+      text-align: center;
+    }
+    form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      width: 90%;
+    }
+    button {
+      background: #2575fc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6a11cb;
+    }
+    #logo {
+      width: 150px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Signup</h2>
+  <form id="signup-form">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="address" placeholder="Address" required>
+    <input type="date" id="dob" placeholder="Date of Birth" required>
+    <input type="text" id="phone" placeholder="Phone Number" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button type="button" onclick="sendOtp()">Send OTP</button>
+  </form>
+
+  <div id="otp-section" style="display: none;">
+    <input type="text" id="otp" placeholder="Enter OTP" required>
+    <button type="button" onclick="verifyOtp()">Verify OTP</button>
+  </div>
+
+  <p id="response"></p>
+
+  <script>
+    function previewLogo() {
+      const input = document.getElementById("logoInput");
+      const logo = document.getElementById("logo");
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          logo.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function sendOtp() {
+      const data = {
+        name: document.getElementById("name").value,
+        address: document.getElementById("address").value,
+        dob: document.getElementById("dob").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+      };
+      const response = await fetch("/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      document.getElementById("response").innerText = await response.text();
+      if (response.ok) document.getElementById("otp-section").style.display = "block";
+    }
+
+    async function verifyOtp() {
+      const data = {
+        otp: document.getElementById("otp").value,
+        name: document.getElementById("name").value,
+        address: document.getElementById("address").value,
+        dob: document.getElementById("dob").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+      };
+      const response = await fetch("/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      document.getElementById("response").innerText = await response.text();
+    }
+  </script>
+</body>
+</html>
