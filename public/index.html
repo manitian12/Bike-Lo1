@@ -104,13 +104,24 @@
         phone: document.getElementById("phone").value,
         email: document.getElementById("email").value,
       };
+      try {
       const response = await fetch("/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      document.getElementById("response").innerText = await response.text();
+      const result = await response.json();
+    if (result.success) {
+      // Redirect to page2.html
+      window.location.href = result.redirect;
+    } else {
+      alert(result.message || "Invalid OTP. Please try again.");
     }
+  } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  }
   </script>
 </body>
 </html>

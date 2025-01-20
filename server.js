@@ -96,10 +96,10 @@ app.post("/verify-otp", async (req, res) => {
 
     await newUser.save();
     delete userOtp[email];
-    return res.status(200).send("Account created successfully!");
+    return res.status(200).json({ success: true, redirect: "/page2.html" });
   }
 
-  res.status(400).send("Invalid OTP");
+  res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
 });
 
 // Serve the index.html file
@@ -108,5 +108,5 @@ app.get("/", (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
