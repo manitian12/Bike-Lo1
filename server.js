@@ -102,25 +102,29 @@ app.post("/verify-otp", async (req, res) => {
 app.post("/api/send-login-otp", async (req, res) => {
   const { email } = req.body;
 
+  console.log("Login OTP request received for email:", email);
+
   if (!email) {
+    console.log("Email is missing in the request.");
     return res.status(400).json({ success: false, message: "Email is required!" });
   }
 
   try {
-    // Check if the user exists
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("User not found:", email);
       return res.status(404).json({ success: false, message: "User not found. Please register first." });
     }
 
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save the OTP to the user's record
-    user.otp = otp; // Ensure the schema includes an `otp` field
+    // Save the OTP in the user's record
+    user.otp = otp; // Ensure your User schema includes an `otp` field
     await user.save();
 
-    // Send OTP via email
+    // Send the OTP via email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -133,18 +137,18 @@ app.post("/api/send-login-otp", async (req, res) => {
       from: process.env.EMAIL,
       to: email,
       subject: "Your Login OTP",
-      text: `Dear User,\n\nYour OTP for login is ${otp}. It is valid for 10 minutes.\n\nThank you.`,
+      text: `Dear User,\n\nYour OTP for login is ${otp}. It is valid for 10 minutes.\n\nThank you, BikeLo Team.`,
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("OTP sent to:", email, "OTP:", otp);
-
-    res.status(200).json({ success: true, message: "Login OTP sent successfully!" });
+    console.log("OTP sent successfully to:", email);
+    res.status(200).json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
     console.error("Error sending OTP:", error);
     res.status(500).json({ success: false, message: "Failed to send OTP. Please try again." });
   }
 });
+
 
 app.post("/api/verify-login-otp", async (req, res) => {
   const { email, otp } = req.body;
@@ -157,15 +161,17 @@ app.post("/api/verify-login-otp", async (req, res) => {
   }
 
   try {
+    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("User not found for email:", email);
+      console.log("User not found:", email);
       return res.status(404).json({ success: false, message: "User not found." });
     }
 
     console.log("User found:", user);
     console.log("Provided OTP:", otp, "Saved OTP:", user.otp);
 
+    // Check if the OTP matches
     if (String(user.otp) !== String(otp)) {
       console.log("OTP mismatch for email:", email);
       return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });

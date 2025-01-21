@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <h1 style="font-weight: bold; color: black;">BikeLo</h1>
-  <img src="bike-logo.png" alt="BikeLo Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
-
+  <title>BikeLo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -45,47 +43,71 @@
       height: auto;
       margin-bottom: 10px;
     }
+    .button-group {
+      display: flex;
+      justify-content: center; /* Center-align the buttons horizontally */
+      gap: 10px; /* Add space between buttons */
+      margin-bottom: 20px;
+    }
+    .button-group button {
+      width: 150px; /* Ensure consistent button width */
+    }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h2>Signup</h2>
-  <form id="signup-form">
-    <input type="text" id="name" placeholder="Name" required>
-    <input type="text" id="address" placeholder="Address" required>
-    <input type="date" id="dob" placeholder="Date of Birth" required>
-    <input type="text" id="phone" placeholder="Phone Number" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <button type="button" onclick="sendOtp()">Send OTP</button>
-  </form>
-  <h2>Login</h2>
-  <form id="login-form">
-    <input type="email" id="login-email" placeholder="Email" required>
-    <button type="button" onclick="sendLoginOtp()">Send OTP</button>
-  </form>
-  
-  <div id="login-otp-section" style="display: none;">
-    <input type="text" id="login-otp" placeholder="Enter OTP" required>
-    <button type="button" onclick="verifyLoginOtp()">Login</button>
-  </div>
-  
-  <div id="otp-section" style="display: none;">
-    <input type="text" id="otp" placeholder="Enter OTP" required>
-    <button type="button" onclick="verifyOtp()">Verify OTP</button>
+  <h1>BikeLo</h1>
+  <img src="bike-logo.png" alt="BikeLo Logo" style="width: 100px; height: auto; margin-bottom: 20px;">
+
+  <!-- Button Group for Switching Between Forms -->
+  <div class="button-group">
+    <button id="signup-btn" onclick="showSignup()">Sign Up</button>
+    <button id="login-btn" onclick="showLogin()">Login</button>
   </div>
 
-  <p id="response"></p>
+  <!-- Sign Up Form -->
+  <div id="signup-form">
+    <h2>Sign Up</h2>
+    <form>
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="address" placeholder="Address" required>
+      <input type="date" id="dob" placeholder="Date of Birth" required>
+      <input type="text" id="phone" placeholder="Phone Number" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <button type="button" onclick="sendOtp()">Send OTP</button>
+    </form>
+    <div id="otp-section" style="display: none;">
+      <input type="text" id="otp" placeholder="Enter OTP" required>
+      <button type="button" onclick="verifyOtp()">Verify OTP</button>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div id="login-form" class="hidden">
+    <h2>Login</h2>
+    <form>
+      <input type="email" id="login-email" placeholder="Email" required>
+      <button type="button" onclick="sendLoginOtp()">Send OTP</button>
+    </form>
+    <div id="login-otp-section" style="display: none;">
+      <input type="text" id="login-otp" placeholder="Enter OTP" required>
+      <button type="button" onclick="verifyLoginOtp()">Login</button>
+    </div>
+  </div>
 
   <script>
-    function previewLogo() {
-      const input = document.getElementById("logoInput");
-      const logo = document.getElementById("logo");
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          logo.src = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
+    // Show Sign Up Form and Hide Login Form
+    function showSignup() {
+      document.getElementById("signup-form").classList.remove("hidden");
+      document.getElementById("login-form").classList.add("hidden");
+    }
+
+    // Show Login Form and Hide Sign Up Form
+    function showLogin() {
+      document.getElementById("login-form").classList.remove("hidden");
+      document.getElementById("signup-form").classList.add("hidden");
     }
 
     async function sendOtp() {
@@ -101,8 +123,12 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      document.getElementById("response").innerText = await response.text();
-      if (response.ok) document.getElementById("otp-section").style.display = "block";
+      const result = await response.text();
+      if (response.ok) {
+        document.getElementById("otp-section").style.display = "block";
+      } else {
+        alert(result);
+      }
     }
 
     async function verifyOtp() {
@@ -115,24 +141,24 @@
         email: document.getElementById("email").value,
       };
       try {
-      const response = await fetch("/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-    if (result.success) {
-      // Redirect to page2.html
-      window.location.href = result.redirect;
-    } else {
-      alert(result.message || "Invalid OTP. Please try again.");
+        const response = await fetch("/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (result.success) {
+          window.location.href = result.redirect;
+        } else {
+          alert(result.message || "Invalid OTP. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong. Please try again.");
+      }
     }
-  } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong. Please try again.");
-    }
-  }
-  async function sendLoginOtp() {
+
+    async function sendLoginOtp() {
   const email = document.getElementById("login-email").value;
 
   if (!email) {
@@ -148,15 +174,15 @@
     });
 
     const result = await response.json();
-    if (result.success) {
-      alert("Login OTP sent successfully!");
+    if (response.ok) {
+      alert("OTP sent successfully!");
       document.getElementById("login-otp-section").style.display = "block";
     } else {
-      alert(result.message || "Failed to send OTP.");
+      alert(result.message || "Failed to send OTP. Please try again.");
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("An error occurred while sending OTP. Please try again.");
+    alert("Something went wrong. Please try again.");
   }
 }
 
@@ -165,18 +191,28 @@ async function verifyLoginOtp() {
   const email = document.getElementById("login-email").value;
   const otp = document.getElementById("login-otp").value;
 
-  const response = await fetch("/api/verify-login-otp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp }),
-  });
+  if (!email || !otp) {
+    alert("Please enter both email and OTP.");
+    return;
+  }
 
-  const result = await response.json();
-  if (result.success) {
-    alert("Login successful!");
-    window.location.href = "/dashboard.html"; // Redirect to a dashboard or another page
-  } else {
-    alert(result.message || "Invalid OTP.");
+  try {
+    const response = await fetch("/api/verify-login-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(result.message || "Login successful!");
+      window.location.href = "/dashboard.html"; // Redirect after successful login
+    } else {
+      alert(result.message || "Invalid OTP. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Something went wrong. Please try again.");
   }
 }
 
