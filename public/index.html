@@ -57,7 +57,17 @@
     <input type="email" id="email" placeholder="Email" required>
     <button type="button" onclick="sendOtp()">Send OTP</button>
   </form>
-
+  <h2>Login</h2>
+  <form id="login-form">
+    <input type="email" id="login-email" placeholder="Email" required>
+    <button type="button" onclick="sendLoginOtp()">Send OTP</button>
+  </form>
+  
+  <div id="login-otp-section" style="display: none;">
+    <input type="text" id="login-otp" placeholder="Enter OTP" required>
+    <button type="button" onclick="verifyLoginOtp()">Login</button>
+  </div>
+  
   <div id="otp-section" style="display: none;">
     <input type="text" id="otp" placeholder="Enter OTP" required>
     <button type="button" onclick="verifyOtp()">Verify OTP</button>
@@ -122,6 +132,54 @@
       alert("Something went wrong. Please try again.");
     }
   }
+  async function sendLoginOtp() {
+  const email = document.getElementById("login-email").value;
+
+  if (!email) {
+    alert("Please enter your email.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/send-login-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("Login OTP sent successfully!");
+      document.getElementById("login-otp-section").style.display = "block";
+    } else {
+      alert(result.message || "Failed to send OTP.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred while sending OTP. Please try again.");
+  }
+}
+
+
+async function verifyLoginOtp() {
+  const email = document.getElementById("login-email").value;
+  const otp = document.getElementById("login-otp").value;
+
+  const response = await fetch("/api/verify-login-otp", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp }),
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    alert("Login successful!");
+    window.location.href = "/dashboard.html"; // Redirect to a dashboard or another page
+  } else {
+    alert(result.message || "Invalid OTP.");
+  }
+}
+
   </script>
 </body>
 </html>
