@@ -3,36 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registration Success</title>
+  <title>BikeLo - Explore Bikes</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #6a11cb, #2575fc);
-      color: white;
+      background: linear-gradient(to bottom, #f9f9f9, #eaeaea);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #000, #444);
+    color: white;
+    padding: 15px 20px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-container img {
+    width: 60px;
+    height: auto;
+    margin-right: 10px;
+  }
+
+  .logo-container h1 {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+    color: #ff4500; /* Stylish color for "BikeLo" */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+  }
+
+  .search-bar input {
+    padding: 10px;
+    width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    font-size: 1em;
+  }
+
+  .search-bar button {
+    padding: 10px 15px;
+    background: #ff4500;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 1.1em;
+  }
+
+  .search-bar button:hover {
+    background: #e63900;
+  }
+
+    .content {
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      color: black;
+
+    .bike-card {
+      display: inline-block;
+      background: white;
+      width: 300px;
+      margin: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .bike-card img {
+      width: 100%;
+      height: auto;
+    }
+
+    .bike-card h3 {
+      color: #333;
+      margin: 10px 0;
+    }
+
+    .bike-card .price {
+      color: red;
+      font-size: 1.2em;
       font-weight: bold;
     }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #2575fc;
+
+    .bike-card button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
       color: white;
       border: none;
-      border-radius: 5px;
+      font-size: 1em;
       cursor: pointer;
     }
-    button:hover {
-      background: #6a11cb;
+
+    .bike-card button:hover {
+      background: #218838;
+    }
+
+    footer {
+      background: #333;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    footer a {
+      color: #ff4500;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Registered Successfully!</h1>
-  <p>Thank you for registering with BikeLo!</p>
-  <button onclick="window.location.href='/'">Go Back to Home</button>
+
+  <header>
+    <div class="logo-container">
+      <img src="bike-logo.png" alt="BikeLo Logo">
+      <h1>BikeLo</h1>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for bikes...">
+      <button>🔍</button>
+    </div>
+  </header>
+
+<div class="content">
+  <h2>Explore Our Bikes</h2>
+
+  <!-- Bike Cards -->
+  <div class="bike-card">
+    <img src="https://cdn.bikedekho.com/processedimages/yamaha/mt-15-2-0/494X300/mt-15-2-06613f8354e5d9.jpg?imwidth=400&impolicy=resize" alt="Bike 1">
+    <h3>Bike Model 1</h3>
+    <p class="price">₹1,00,000</p>
+    <button onclick="buyBike('Bike Model 1')">Buy</button>
+  </div>
+
+  <div class="bike-card">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6siB3YN7XqvOQx6uedkwsbZOCAu9kq8AhA&s" alt="Bike 2">
+    <h3>Bike Model 2</h3>
+    <p class="price">₹1,50,000</p>
+    <button onclick="buyBike('Bike Model 2')">Buy</button>
+  </div>
+
+  <div class="bike-card">
+    <img src="https://imgd.aeplcdn.com/1280x720/n/tghapeb_1773039.jpg" alt="Bike 3">
+    <h3>Bike Model 3</h3>
+    <p class="price">₹2,00,000</p>
+    <button onclick="buyBike('Bike Model 3')">Buy</button>
+  </div>
+
+  <div class="bike-card">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2SiaBV4_3BCGVgV9BS2JkydN-huDaCgq_BA&s" alt="Bike 4">
+    <h3>Bike Model 4</h3>
+    <p class="price">₹2,50,000</p>
+    <button onclick="buyBike('Bike Model 4')">Buy</button>
+  </div>
+</div>
+
+<footer>
+  <p>Need help? Contact our <a href="support.html">Support Team</a>.</p>
+</footer>
+
+<script>
+  function buyBike(bikeName) {
+    alert(`You have selected ${bikeName}. Redirecting to the purchase page...`);
+    // Replace with actual redirect URL
+    window.location.href = `/purchase?bike=${bikeName}`;
+  }
+</script>
+
 </body>
 </html>
