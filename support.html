@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BikeLo - Support</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+      color: white;
+    }
+
+    header {
+      background: #000;
+      padding: 10px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      color: #ffd700;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .contact-info {
+      margin-bottom: 30px;
+    }
+
+    .contact-info p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .support-form {
+      text-align: center;
+    }
+
+    .support-form input,
+    .support-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .support-form button {
+      background: #ffd700;
+      color: black;
+      font-size: 1.1rem;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .support-form button:hover {
+      background: #ffcc00;
+    }
+
+    footer {
+      background: #000;
+      padding: 10px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    footer a {
+      color: #ffd700;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BikeLo Support</h1>
+  </header>
+
+  <div class="container">
+    <h2>We're Here to Help!</h2>
+
+    <div class="contact-info">
+      <p><strong>Email:</strong> support@bikelo.com</p>
+      <p><strong>Phone:</strong> +91-1234567890</p>
+      <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM</p>
+    </div>
+
+    <div class="support-form">
+      <h3>Contact Us Directly</h3>
+      <form id="support-form">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>Need help? Contact us via email or phone, or visit the <a href="/faq.html">FAQ page</a>.</p>
+  </footer>
+
+  <script>
+    document.getElementById('support-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Thank you for reaching out! We will get back to you soon.');
+    });
+  </script>
+</body>
+</html>
+  

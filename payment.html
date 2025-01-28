@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BikeLo - Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .payment-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: white;
+      display: inline-block;
+      text-align: center;
+    }
+    button, a {
+      background: #2575fc;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    button:hover, a:hover {
+      background: #6a11cb;
+    }
+    img {
+      width: 200px;
+      margin: 20px auto;
+    }
+    .confirmation {
+      margin-top: 30px;
+    }
+    .confirmation button {
+      background: #28a745;
+    }
+    .confirmation button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>Complete Your Payment</h1>
+  <p>Select a payment method to proceed:</p>
+
+
+  <!-- UPI QR Code Section -->
+  <div class="payment-section">
+    <h3>Pay via QR Code</h3>
+    <p>Scan the QR code below using your UPI app:</p>
+    <img src="qr-code.png" alt="UPI QR Code">
+    <p>After completing the payment, click the button below:</p>
+    <div class="confirmation">
+      <button onclick="confirmPayment()">Confirm Payment</button>
+    </div>
+  </div>
+  <div class="payment-options">
+    <button onclick="payWithCOD()">Cash on Delivery</button>
+  </div>
+  
+  <script>
+    function payWithCOD() {
+      // Example of sending payment details for COD
+      const paymentData = {
+        name: "John Doe",
+        email: "john@example.com",
+        phone: "1234567890",
+        bike: "Bike Model 1",
+        price: 85000,
+        paymentMethod: "Cash on Delivery",
+      };
+  
+      fetch("/save-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paymentData),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.success) {
+            alert("Order placed successfully! Pay on delivery.");
+            window.location.href = "/success";
+          } else {
+            alert("Failed to place order. Please try again.");
+          }
+        });
+    }
+  </script>
+  
+  <script>
+    async function confirmPayment() {
+  const paymentData = {
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "1234567890",
+    bike: "Bike Model 1",
+    price: 85000,
+    paymentMethod: "UPI", // Or "Cash on Delivery"
+  };
+
+  const response = await fetch("/save-payment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(paymentData),
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    alert("Payment saved successfully!");
+    window.location.href = "/success"; // Redirect to success page
+  } else {
+    alert("Failed to save payment. Please try again.");
+  }
+}
+
+  </script>
+</body>
+</html>

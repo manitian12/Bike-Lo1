@@ -206,7 +206,7 @@ async function verifyLoginOtp() {
     const result = await response.json();
     if (response.ok) {
       alert(result.message || "Login successful!");
-      window.location.href = "/dashboard.html"; // Redirect after successful login
+      window.location.href = "/page2.html";
     } else {
       alert(result.message || "Invalid OTP. Please try again.");
     }

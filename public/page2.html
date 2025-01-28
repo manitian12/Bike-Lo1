@@ -45,6 +45,32 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   }
 
+  .location {
+    margin-left: 10px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    background: white;
+    color: black;
+    border: 1px solid #ddd;
+    z-index: 10;
+    width: 150px;
+  }
+
+  .dropdown p {
+    padding: 10px;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .dropdown p:hover {
+    background: #f5f5f5;
+  }
+
   .search-bar {
     display: flex;
     align-items: center;
@@ -71,6 +97,10 @@
   .search-bar button:hover {
     background: #e63900;
   }
+  
+  .main {
+      padding: 40px;
+    }
 
     .content {
       text-align: center;
@@ -145,6 +175,14 @@
       <img src="bike-logo.png" alt="BikeLo Logo">
       <h1>BikeLo</h1>
     </div>
+    <div class="location">
+      <span onclick="toggleCityDropdown()">📍 Select Location</span>
+      <div id="city-dropdown" class="dropdown" style="display: none;">
+        <p onclick="selectCity('Delhi')">Delhi</p>
+        <p onclick="selectCity('Mumbai')">Mumbai</p>
+        <p onclick="selectCity('Bhopal')">Bengaluru</p>
+        <p onclick="selectCity('Indore')">Kolkata</p>
+      </div>
     <div class="search-bar">
       <input type="text" placeholder="Search for bikes...">
       <button>🔍</button>
@@ -157,44 +195,84 @@
   <!-- Bike Cards -->
   <div class="bike-card">
     <img src="https://cdn.bikedekho.com/processedimages/yamaha/mt-15-2-0/494X300/mt-15-2-06613f8354e5d9.jpg?imwidth=400&impolicy=resize" alt="Bike 1">
-    <h3>Bike Model 1</h3>
-    <p class="price">₹1,00,000</p>
-    <button onclick="buyBike('Bike Model 1')">Buy</button>
+    <h3>Honda 2021</h3>
+    <p>Price: ₹10</p>
+    <button onclick="redirectToPayment()">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6siB3YN7XqvOQx6uedkwsbZOCAu9kq8AhA&s" alt="Bike 2">
-    <h3>Bike Model 2</h3>
-    <p class="price">₹1,50,000</p>
-    <button onclick="buyBike('Bike Model 2')">Buy</button>
+    <h3>Hero 2015</h3>
+    <p>Price: ₹50,000</p>
+    <button onclick="redirectToPayment()">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://imgd.aeplcdn.com/1280x720/n/tghapeb_1773039.jpg" alt="Bike 3">
-    <h3>Bike Model 3</h3>
-    <p class="price">₹2,00,000</p>
-    <button onclick="buyBike('Bike Model 3')">Buy</button>
+    <h3>Apache 2020</h3>
+    <p>Price: ₹20,000</p>
+    <button onclick="redirectToPayment()">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2SiaBV4_3BCGVgV9BS2JkydN-huDaCgq_BA&s" alt="Bike 4">
     <h3>Bike Model 4</h3>
-    <p class="price">₹2,50,000</p>
-    <button onclick="buyBike('Bike Model 4')">Buy</button>
+    <p>Price: ₹20,000</p>
+    <button onclick="redirectToPayment()">Buy</button>
   </div>
-</div>
+
+<script>
+  async function initiatePayment() {
+    const data = {
+      amount: 500, // Amount in rupees
+      currency: "INR",
+    };
+
+    try {
+      const response = await fetch('/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert(`Payment initiated. Order ID: ${result.order.id}`);
+        // Redirect or do further steps
+      } else {
+        alert("Payment failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Something went wrong. Try again later.");
+    }
+  }
+  function redirectToPayment() {
+    window.location.href = "/payment";
+  }
+</script>
 
 <footer>
   <p>Need help? Contact our <a href="support.html">Support Team</a>.</p>
 </footer>
 
 <script>
+  function toggleCityDropdown() {
+    const dropdown = document.getElementById("city-dropdown");
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+  }
+
+  function selectCity(city) {
+    alert(`${city} selected as your location.`);
+    const locationElement = document.querySelector(".location span");
+    locationElement.innerHTML = `📍 ${city}`;
+    document.getElementById("city-dropdown").style.display = "none";
+  }
   function buyBike(bikeName) {
     alert(`You have selected ${bikeName}. Redirecting to the purchase page...`);
     // Replace with actual redirect URL
     window.location.href = `/purchase?bike=${bikeName}`;
   }
 </script>
-
 </body>
 </html>

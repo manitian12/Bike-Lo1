@@ -12,13 +12,13 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(useragent.express()); // Middleware to get user agent info
 
-// Connect to MongoDB
+// Database Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-// User schema and model
+// User Schema and Model
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -26,20 +26,44 @@ const userSchema = new mongoose.Schema({
   dob: { type: String, required: true },
   phone: { type: String, required: true },
   otp: { type: String }, // Field to store the OTP
+  ip: { type: String },
+  device: { type: String },
+  browser: { type: String },
+  os: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);
+app.get("/payment", (req, res) => {
+  res.sendFile(path.join(__dirname, "payment.html"));
+});
 
-module.exports = User;
-let userOtp = {};
+// Payment Schema
+const PaymentSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  phone: String,
+  bike: String,
+  price: Number,
+  paymentMethod: String, // UPI, Cash on Delivery, etc.
+  date: { type: Date, default: Date.now },
+});
 
+const Payment = mongoose.model("Payment", PaymentSchema);
 
-// Send OTP
+const userOtp = {}; // Temporary storage for OTPs (can be replaced with Redis for scalability)
+
+// Serve Static Files
+app.use(express.static(path.join(__dirname)));
+
+// **ROUTES**
+
+// Send OTP for Signup
 app.post("/send-otp", async (req, res) => {
   const { email, name, address, dob, phone } = req.body;
 
-  if (!email) return res.status(400).send("Email is required!");
-  if (!name || !address || !dob || !phone) return res.status(400).send("All fields are required!");
+  if (!email || !name || !address || !dob || !phone) {
+    return res.status(400).send("All fields are required!");
+  }
 
   const otp = crypto.randomInt(100000, 999999).toString();
   userOtp[email] = otp;
@@ -56,22 +80,19 @@ app.post("/send-otp", async (req, res) => {
     from: process.env.EMAIL,
     to: email,
     subject: "Your BikeLo OTP",
-    text: `Dear sir/madam,
-
-Your BikeLo one-time password is ${otp}. It is valid for 10 minutes only.
-
-Thank you.`,
+    text: `Dear ${name},\n\nYour BikeLo one-time password is ${otp}. It is valid for 10 minutes only.\n\nThank you.`,
   };
 
   try {
     await transporter.sendMail(mailOptions);
     res.status(200).send("OTP sent successfully!");
   } catch (error) {
+    console.error("Error sending OTP:", error);
     res.status(500).send("Failed to send OTP");
   }
 });
 
-// Verify OTP and Save User Data
+// Verify OTP for Signup
 app.post("/verify-otp", async (req, res) => {
   const { email, otp, name, address, dob, phone } = req.body;
 
@@ -81,50 +102,42 @@ app.post("/verify-otp", async (req, res) => {
 
     const newUser = new User({
       name,
+      email,
       address,
       dob,
       phone,
-      email,
       ip,
       device: deviceInfo.platform || "Unknown",
       browser: deviceInfo.browser || "Unknown",
       os: deviceInfo.os || "Unknown",
-      verified: true,
     });
 
     await newUser.save();
-    delete userOtp[email];
+    delete userOtp[email]; // Remove OTP after verification
     return res.status(200).json({ success: true, redirect: "/page2.html" });
   }
 
   res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
 });
+
+// Send OTP for Login
 app.post("/api/send-login-otp", async (req, res) => {
   const { email } = req.body;
 
-  console.log("Login OTP request received for email:", email);
-
   if (!email) {
-    console.log("Email is missing in the request.");
     return res.status(400).json({ success: false, message: "Email is required!" });
   }
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("User not found:", email);
       return res.status(404).json({ success: false, message: "User not found. Please register first." });
     }
 
-    // Generate a 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Save the OTP in the user's record
-    user.otp = otp; // Ensure your User schema includes an `otp` field
+    const otp = crypto.randomInt(100000, 999999).toString();
+    user.otp = otp;
     await user.save();
 
-    // Send the OTP via email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -141,7 +154,6 @@ app.post("/api/send-login-otp", async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("OTP sent successfully to:", email);
     res.status(200).json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
     console.error("Error sending OTP:", error);
@@ -149,52 +161,59 @@ app.post("/api/send-login-otp", async (req, res) => {
   }
 });
 
-
+// Verify OTP for Login
 app.post("/api/verify-login-otp", async (req, res) => {
   const { email, otp } = req.body;
 
-  console.log("Verify Login OTP request received:", { email, otp });
-
-  if (!email || !otp) {
-    console.log("Email or OTP missing in request.");
-    return res.status(400).json({ success: false, message: "Email and OTP are required!" });
-  }
-
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
-    if (!user) {
-      console.log("User not found:", email);
-      return res.status(404).json({ success: false, message: "User not found." });
-    }
-
-    console.log("User found:", user);
-    console.log("Provided OTP:", otp, "Saved OTP:", user.otp);
-
-    // Check if the OTP matches
-    if (String(user.otp) !== String(otp)) {
-      console.log("OTP mismatch for email:", email);
+    if (!user || user.otp !== otp) {
       return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
     }
 
-    // Clear the OTP after successful verification
-    user.otp = null;
+    user.otp = null; // Clear OTP after successful login
     await user.save();
-
-    console.log("OTP verified successfully for email:", email);
-    res.status(200).json({ success: true, message: "Login successful!" });
+    res.status(200).json({ success: true, redirect: "/page2.html" });
   } catch (error) {
     console.error("Error verifying OTP:", error);
     res.status(500).json({ success: false, message: "An error occurred. Please try again." });
   }
 });
 
+// Save Payment
+app.post("/save-payment", async (req, res) => {
+  const { name, email, phone, bike, price, paymentMethod } = req.body;
 
-// Serve the index.html file
+  if (!name || !email || !phone || !bike || !price) {
+    return res.status(400).json({ success: false, message: "All payment details are required!" });
+  }
+
+  try {
+    const payment = new Payment({
+      name,
+      email,
+      phone,
+      bike,
+      price,
+      paymentMethod, // e.g., "Cash on Delivery", "UPI", etc.
+    });
+    await payment.save();
+    res.status(200).json({ success: true, message: "Payment saved successfully!" });
+  } catch (error) {
+    console.error("Error saving payment:", error);
+    res.status(500).json({ success: false, message: "Failed to save payment." });
+  }
+});
+app.get("/success", (req, res) => {
+  res.sendFile(path.join(__dirname, "success.html"));
+});
+
+
+// Serve Static Pages
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Start Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = 5000;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
