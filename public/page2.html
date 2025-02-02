@@ -190,37 +190,57 @@
   </header>
 
 <div class="content">
-  <h2>Explore Our Bikes</h2>
+  <h2>Buy Bike</h2>
 
   <!-- Bike Cards -->
   <div class="bike-card">
     <img src="https://cdn.bikedekho.com/processedimages/yamaha/mt-15-2-0/494X300/mt-15-2-06613f8354e5d9.jpg?imwidth=400&impolicy=resize" alt="Bike 1">
     <h3>Honda 2021</h3>
-    <p>Price: ₹10</p>
-    <button onclick="redirectToPayment()">Buy</button>
+    <p>Price: ₹100000</p>
+    <button onclick="storeBikeDetails('Honda 2021', '100000')">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6siB3YN7XqvOQx6uedkwsbZOCAu9kq8AhA&s" alt="Bike 2">
     <h3>Hero 2015</h3>
     <p>Price: ₹50,000</p>
-    <button onclick="redirectToPayment()">Buy</button>
+    <button onclick="storeBikeDetails('Apache 2020', '20000')">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://imgd.aeplcdn.com/1280x720/n/tghapeb_1773039.jpg" alt="Bike 3">
     <h3>Apache 2020</h3>
     <p>Price: ₹20,000</p>
-    <button onclick="redirectToPayment()">Buy</button>
+    <button onclick="storeBikeDetails('Apache 2020', '20000')">Buy</button>
   </div>
 
   <div class="bike-card">
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2SiaBV4_3BCGVgV9BS2JkydN-huDaCgq_BA&s" alt="Bike 4">
-    <h3>Bike Model 4</h3>
-    <p>Price: ₹20,000</p>
-    <button onclick="redirectToPayment()">Buy</button>
+    <h3>Bullet 2012</h3>
+    <p>Price: ₹40,000</p>
+    <button onclick="storeBikeDetails('Bullet 2012', '40000')">Buy</button>
   </div>
 
+  <div class="content">
+    <h2>Bikes for Rent</h2>
+  
+    <!-- Bike Cards -->
+    <div class="bike-card">
+      <img src="https://cdn.bikedekho.com/processedimages/yamaha/mt-15-2-0/494X300/mt-15-2-06613f8354e5d9.jpg?imwidth=400&impolicy=resize" alt="Bike 1">
+      <h3>Honda 2021</h3>
+      <p>Price: ₹100/hr</p>
+      <button onclick="storeBikeDetails('Honda 2021', '100/hr')">Buy</button>
+      <p>          </p>
+    </div>
+  
+    <div class="bike-card">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6siB3YN7XqvOQx6uedkwsbZOCAu9kq8AhA&s" alt="Bike 2">
+      <h3>Hero 2015</h3>
+      <p>Price: ₹50/hr</p>
+      <button onclick="storeBikeDetails('Apache 2020', '50/hr')">Buy</button>
+      <p>          </p>
+    </div>
+  
 <script>
   async function initiatePayment() {
     const data = {
@@ -250,6 +270,15 @@
   function redirectToPayment() {
     window.location.href = "/payment";
   }
+</script>
+
+<script>
+  function storeBikeDetails(bikeName, bikePrice) {
+    localStorage.setItem("selectedBike", bikeName);
+    localStorage.setItem("selectedPrice", bikePrice);
+    window.location.href = "/payment";
+  }
+
 </script>
 
 <footer>

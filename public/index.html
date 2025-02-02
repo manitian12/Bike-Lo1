@@ -148,8 +148,11 @@
         });
         const result = await response.json();
         if (result.success) {
-          window.location.href = result.redirect;
-        } else {
+      alert("OTP verified successfully!");
+      localStorage.setItem("userEmail", result.email); // ✅ Store the correct email
+      console.log("Stored Email in localStorage:", localStorage.getItem("userEmail")); // Debugging check
+      window.location.href = result.redirect;
+    } else {
           alert(result.message || "Invalid OTP. Please try again.");
         }
       } catch (error) {
@@ -206,6 +209,8 @@ async function verifyLoginOtp() {
     const result = await response.json();
     if (response.ok) {
       alert(result.message || "Login successful!");
+      localStorage.setItem("userEmail", result.email); // ✅ Store the correct email
+      console.log("Stored Email in localStorage:", localStorage.getItem("userEmail")); // Debugging check
       window.location.href = "/page2.html";
     } else {
       alert(result.message || "Invalid OTP. Please try again.");
@@ -215,7 +220,6 @@ async function verifyLoginOtp() {
     alert("Something went wrong. Please try again.");
   }
 }
-
   </script>
 </body>
 </html>

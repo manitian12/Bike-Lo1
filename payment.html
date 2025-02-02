@@ -5,127 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BikeLo - Payment</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f5f5f5;
-      padding: 20px;
-    }
-    h1 {
-      color: #333;
-    }
-    .payment-section {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: white;
-      display: inline-block;
-      text-align: center;
-    }
-    button, a {
-      background: #2575fc;
-      color: white;
-      padding: 10px 20px;
-      text-decoration: none;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-      display: inline-block;
-    }
-    button:hover, a:hover {
-      background: #6a11cb;
-    }
-    img {
-      width: 200px;
-      margin: 20px auto;
-    }
-    .confirmation {
-      margin-top: 30px;
-    }
-    .confirmation button {
-      background: #28a745;
-    }
-    .confirmation button:hover {
-      background: #218838;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #f5f5f5; padding: 20px; }
+    h1 { color: #333; }
+    .payment-options, .payment-section { margin: 20px 0; }
+    button { background: #2575fc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    button:hover { background: #6a11cb; }
   </style>
 </head>
 <body>
+
   <h1>Complete Your Payment</h1>
-  <p>Select a payment method to proceed:</p>
+  <p id="bike-info"></p>
+  <p id="user-email"></p>
 
-
-  <!-- UPI QR Code Section -->
-  <div class="payment-section">
-    <h3>Pay via QR Code</h3>
-    <p>Scan the QR code below using your UPI app:</p>
-    <img src="qr-code.png" alt="UPI QR Code">
-    <p>After completing the payment, click the button below:</p>
-    <div class="confirmation">
-      <button onclick="confirmPayment()">Confirm Payment</button>
-    </div>
-  </div>
   <div class="payment-options">
-    <button onclick="payWithCOD()">Cash on Delivery</button>
+    <label><input type="radio" name="payment-method" value="UPI"> Pay with UPI</label><br>
+    <label><input type="radio" name="payment-method" value="Cash on Delivery"> Cash on Delivery</label><br>
   </div>
-  
-  <script>
-    function payWithCOD() {
-      // Example of sending payment details for COD
-      const paymentData = {
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "1234567890",
-        bike: "Bike Model 1",
-        price: 85000,
-        paymentMethod: "Cash on Delivery",
-      };
-  
-      fetch("/save-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(paymentData),
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          if (result.success) {
-            alert("Order placed successfully! Pay on delivery.");
-            window.location.href = "/success";
-          } else {
-            alert("Failed to place order. Please try again.");
-          }
-        });
-    }
-  </script>
-  
-  <script>
-    async function confirmPayment() {
-  const paymentData = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "1234567890",
-    bike: "Bike Model 1",
-    price: 85000,
-    paymentMethod: "UPI", // Or "Cash on Delivery"
-  };
 
-  const response = await fetch("/save-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(paymentData),
+  <button onclick="confirmPayment()">Confirm Payment</button>
+  <p id="response-message"></p>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bikeName = localStorage.getItem("selectedBike");
+    const bikePrice = localStorage.getItem("selectedPrice");
+    const userEmail = localStorage.getItem("userEmail");  // ✅ Get email from localStorage
+
+    if (bikeName && bikePrice) {
+      document.getElementById("bike-info").innerHTML = `<strong>Bike:</strong> ${bikeName} | <strong>Price:</strong> ₹${bikePrice}`;
+    } else {
+      document.getElementById("bike-info").innerHTML = "⚠ No bike selected. Please go back and choose a bike.";
+    }
+
+    if (userEmail) {
+      document.getElementById("user-email").innerHTML = `<strong>Email:</strong> ${userEmail}`;
+    } else {
+      document.getElementById("user-email").innerHTML = "⚠ Error: No logged-in user detected.";
+    }
   });
 
-  const result = await response.json();
-  if (result.success) {
-    alert("Payment saved successfully!");
-    window.location.href = "/success"; // Redirect to success page
-  } else {
-    alert("Failed to save payment. Please try again.");
-  }
-}
+  document.addEventListener("DOMContentLoaded", function () {
+    const bikeName = localStorage.getItem("selectedBike");
+    const bikePrice = localStorage.getItem("selectedPrice");
+    const userEmail = localStorage.getItem("userEmail"); // ✅ Fetch stored email
 
+    if (bikeName && bikePrice) {
+      document.getElementById("bike-info").innerHTML = `<strong>Bike:</strong> ${bikeName} | <strong>Price:</strong> ₹${bikePrice}`;
+    } else {
+      document.getElementById("bike-info").innerHTML = "⚠ No bike selected. Please go back and choose a bike.";
+    }
+
+    if (userEmail) {
+      document.getElementById("user-email").innerHTML = `<strong>Email:</strong> ${userEmail}`;
+    } else {
+      document.getElementById("user-email").innerHTML = "⚠ Error: No logged-in user detected.";
+      console.log("🚨 No user email found in localStorage.");
+    }
+  });
+
+
+    async function confirmPayment() {
+      const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+      if (!selectedPaymentMethod) {
+        alert("Please select a payment method.");
+        return;
+      }
+
+      const userEmail = localStorage.getItem("userEmail");
+      const bikeName = localStorage.getItem("selectedBike");
+      const bikePrice = localStorage.getItem("selectedPrice");
+
+      if (!userEmail || !bikeName || !bikePrice) {
+        alert("Error: Missing user or bike details. Please log in and select a bike.");
+        return;
+      }
+
+      const paymentData = {
+        email: userEmail,
+        bike: bikeName,
+        price: parseInt(bikePrice),
+        paymentMethod: selectedPaymentMethod.value,
+      };
+
+      try {
+        const response = await fetch("/save-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(paymentData),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          document.getElementById("response-message").innerText = "✅ Payment confirmed! Redirecting...";
+          setTimeout(() => {
+            window.location.href = "/success";
+          }, 2000);
+        } else {
+          alert(result.message || "❌ Payment failed. Try again.");
+        }
+      } catch (error) {
+        console.error("Error confirming payment:", error);
+        alert("❌ Something went wrong. Please try again.");
+      }
+    }
   </script>
+
 </body>
 </html>
